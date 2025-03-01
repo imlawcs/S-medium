@@ -1,0 +1,15 @@
+Postgres {}
+
+NodeJS Poller {}
+
+MongoDB {}
+
+NodeJS Poller -> Postgres: Polling the database
+NodeJS Poller -> MongoDB: Insert into MongoDb
+
+PostgresTable {
+  shape: sql_table
+  id: int
+  is_synced: boolean
+}
+

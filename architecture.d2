@@ -1,0 +1,31 @@
+SGroup Blog App {
+  FE {
+    label: Frontend App
+  }
+
+  BE {
+    label: Backend App
+
+    CM: {
+      label: Command Ingress
+    }
+
+    Connector: {}
+
+    Redis: {}
+
+    MongoDB: {
+      shape: queue
+    }
+  }
+
+  FE -> BE.CM: Http requests
+
+  BE.CM -> BE.MongoDB: Fetch, persist data
+
+  BE.MongoDB -> BE.Connector: Push changes
+
+  BE.Connector -> BE.Redis: Aggregate, persist changes
+
+  BE.CM -> BE.Redis: Fetch pre-calculated data
+}
