@@ -4,6 +4,7 @@ import { PostService } from '../types';
 import { CreatePostBody, GetPostDto, UpdatePostBody } from './dto';
 import responseValidationError from '../../../shared/response';
 import { HttpRequest } from '../../../types';
+import { log } from 'console';
 
 export class PostController extends BaseController {
   service: PostService;
@@ -31,10 +32,12 @@ export class PostController extends BaseController {
   async createPost(req: HttpRequest, res: Response, next: NextFunction): Promise<void> {
     await this.execWithTryCatchBlock(req, res, next, async (req, res, _next) => {
       const body = new CreatePostBody(req.body);
+      // console.log(body);      
       const sub = req.getSubject();
       const validateResult = await body.validate();
       if (!validateResult.ok) {
         responseValidationError(res, validateResult.errors[0]);
+        // console.log(validateResult.errors[0]);        
         return;
       }
 
