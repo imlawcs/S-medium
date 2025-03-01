@@ -68,6 +68,11 @@ export class PostController extends BaseController {
     await this.execWithTryCatchBlock(req, res, next, async (req, res, _next) => {
       const id = req.params.id;
       const body = new UpdatePostBody(req.body);
+      const validateResult = await body.validate();
+      if (!validateResult.ok) {
+        responseValidationError(res, validateResult.errors[0]);
+        return;
+      }
       const post = await this.service.updatePost(id, body);
 
       res.status(200).json(post);
