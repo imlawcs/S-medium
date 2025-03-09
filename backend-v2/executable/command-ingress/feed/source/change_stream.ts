@@ -51,7 +51,6 @@ class MongoDBChangeStreamSource implements Source {
 
         changeStream.on('change', async (change) => {
             if (change?.operationType && this.watchOperations.includes(change.operationType)) {
-                console.info(`[MongoDBChangeStreamSource] Detected ${change.operationType} operation:`, change);
                 eventEmitter.emit('change', change);
                 
                 if (change._id) {
