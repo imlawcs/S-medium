@@ -13,7 +13,7 @@ class MongoDBChangeStreamSource implements Source {
         redisClient: ReturnType<typeof createClient>,
         mongoDbClient: Db,
         mongoDbCollectionName: string,
-        watchOperations: string[] = ['insert', 'update', 'delete'] // Thêm delete
+        watchOperations: string[] = ['insert', 'update', 'delete'] 
     ) {
         this.redisClient = redisClient;
         this.mongoDbClient = mongoDbClient;

@@ -70,4 +70,32 @@ export class TransformDataOperator implements Operator {
             }
         }
     }
+
+    async delete(data: any): Promise<any> {
+        const postId = data.documentKey._id;
+        
+        const timestamp = new Date().getTime();
+
+        const post = await PostModel.findById(postId).populate('author');
+        
+        if (!post) {
+            console.log(`[TransformData] Post not found for ID: ${postId}`);
+            return null;
+        }
+
+        const author = post.author;
+        const followers = _.get(author, 'followers', []).map((follower) => String(follower));
+
+        return {
+            sinkData: {
+                ...data,
+                followers,
+                postMetadata: {
+                    postId: String(postId),
+                    timestamp,
+                    operationType: 'delete'
+                }
+            }
+        };
+    }
 }
