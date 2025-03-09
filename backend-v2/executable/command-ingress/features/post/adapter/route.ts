@@ -18,7 +18,7 @@ const setupPostRoute = (
   router.route('/:id')
     .get(controller.getPost.bind(controller))
     .put(controller.updatePost.bind(controller))
-    .delete(controller.deletePost.bind(controller));
+    .delete(controller.deletePost.bind(controller))
 
   return router;
 }

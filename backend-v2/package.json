@@ -8,6 +8,7 @@
     "test": "jest",
     "dev:api-example": "nodemon samples/main.ts",
     "dev:command-ingress": "nodemon executable/command-ingress/main.ts",
+    "dev:mongodb-redis-connector": "nodemon executable/mongodb-redis-connector/main.ts",
     "lint": "npx eslint .",
     "lint:fix": "npx eslint --fix ."
   },
@@ -26,7 +27,7 @@
     "express-async-handler": "^1.2.0",
     "jsonwebtoken": "^9.0.0",
     "lodash": "^4.17.21",
-    "mongodb": "^6.13.0",
+    "mongodb": "^6.14.2",
     "mongoose": "^7.0.1",
     "morgan": "^1.10.0",
     "qs": "^6.11.1",
