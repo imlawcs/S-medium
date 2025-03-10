@@ -1,11 +1,11 @@
 import express from 'express';
-import isAuthenticated from '../../middlewares/auth.ts';
+import isAuthenticated from '../../middlewares/auth';
 
 import {
   suggestMore,
   suggestTopics,
   suggestTopPosts,
-} from './service.ts';
+} from './service';
 
 
 const setupSuggestionRoute = () => {

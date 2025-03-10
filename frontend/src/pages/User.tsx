@@ -92,16 +92,17 @@ export default function User() {
 
   const { refetch: getAllFollowers } = useQuery({
     queryFn: () => httpRequest.get(`${url}/users/followers/${id}`),
-    enabled: false,
+    enabled: true,
     queryKey: ["followers", "user", id],
     onSuccess(res) {
+      console.log('Res: ', res.data);
       setUserData(res.data);
     },
   });
 
   const { refetch: getAllFollowings } = useQuery({
     queryFn: () => httpRequest.get(`${url}/users/followings/${id}`),
-    enabled: false,
+    enabled: true,
     queryKey: ["followings", "user", id],
     onSuccess(res) {
       setUserData(res.data);

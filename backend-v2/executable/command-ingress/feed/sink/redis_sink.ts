@@ -163,6 +163,32 @@ export class RedisSink implements Sink {
             console.error('[RedisSink] Error deleting post:', error);
         }
     }
+
+    async getUserFeed(userId: string, limit = 10, offset = 0): Promise<any[]> {
+        try {
+            const feedKey = `user:${userId}:feed`;
+    
+            const postIds = await this.redisClient.zRange(feedKey, -limit - offset, -1 - offset, { REV: true });
+                
+            if (postIds.length === 0) {
+                console.log(`[RedisSink] Không có bài viết trong feed của user ${userId}`);
+                return [];
+            }
+    
+            const postKeys = postIds.map((postId) => `post:${postId}`);
+            const postData = await this.redisClient.mGet(postKeys);
+    
+            const posts = postData
+                .map((data, index) => (data ? { postId: postIds[index], ...JSON.parse(data) } : null))
+                .filter(Boolean);
+    
+            console.log(`[RedisSink] Trả về ${posts.length} bài viết cho user ${userId}`);
+            return posts;
+        } catch (error) {
+            console.error('[RedisSink] Lỗi khi lấy feed:', error);
+            return [];
+        }
+    }
 }
 
 export default RedisSink;

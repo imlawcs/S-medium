@@ -36,7 +36,7 @@ function HomeContainer({tag}: { tag: string }) {
     useQuery({
         queryFn: () =>
             httpRequest.get(
-                `${url}/post/${tag === "Following" ? "users" : "topic"}/${tag}`
+                `${url}/post/feeds`
             ),
         queryKey: ["home", "topic", tag],
         enabled: tag != undefined,
@@ -84,21 +84,22 @@ function HomeContainer({tag}: { tag: string }) {
                     }}
                 >
                     {posts.map((item) => {
+                        console.log(item)
                         return (
                             <Post
                                 showUserList={true}
                                 filterPost={filterPost}
                                 filterAuthorPost={filterAuthorPost}
-                                postId={item.post.id}
-                                timestamp={item.post.createdAt}
-                                title={item.post.title}
-                                username={item.user.name}
-                                userId={item.user.id}
-                                image={item.post.image}
-                                tag={item.post.tags.at(0)}
-                                userImage={item.user.avatar}
-                                key={item.post.id}
-                                summary={item.post.summary}
+                                postId={item._id}
+                                timestamp={new Date(item.createdAt).getTime().toString()}
+                                title={item.title}
+                                username={item.author.name}
+                                userId={item.author._id}
+                                image={item.image}
+                                tag={item.tags.at(0)}
+                                userImage={item.author.avatar}
+                                key={item._id}
+                                summary={item.summary}
                             />
                         );
                     })}

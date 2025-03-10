@@ -7,22 +7,22 @@ import {useAuth} from "../contexts/Auth";
 import {httpRequest} from "../interceptor/axiosInterceptor";
 
 const DEFAULT_OPTIONS = [
-    {
-        id: 1,
-        title: "For you",
-        url: "/",
-    },
+    // {
+    //     id: 1,
+    //     title: "For you",
+    //     url: "/",
+    // },
     {
         id: 2,
-        title: "Following",
-        url: "/tag/Following",
+        title: "News Feed",
+        url: "/tag/Feed",
     },
 ];
 
 export default function SuggestionBar({activeTab}: { activeTab: string }) {
     const {user} = useAuth();
     const {data: response} = useQuery({
-        queryFn: () => httpRequest.get(`${url}/users/interests`),
+        queryFn: () => httpRequest.get(`${url}/post/feeds`),
         queryKey: ["interests", "get", user?.id],
     });
     const [options, setOptions] = useState(DEFAULT_OPTIONS);

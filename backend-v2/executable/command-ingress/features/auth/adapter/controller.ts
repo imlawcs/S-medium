@@ -46,17 +46,29 @@ class AuthController extends BaseController {
 
   async logout(req: HttpRequest, res: Response, next: NextFunction): Promise<void> {
     await this.execWithTryCatchBlock(req, res, next, async (req, res, _next) => {
-      const logoutRequestBody = new LogoutRequestBody(req.body);
-      const validateResult = await logoutRequestBody.validate();
-      if (!validateResult.ok) {
-        responseValidationError(res, validateResult.errors[0]);
-        return;
+      try {
+        const logoutRequestBody = new LogoutRequestBody(req.body);
+        
+        const validateResult = await logoutRequestBody.validate();
+        if (!validateResult.ok) {
+          console.error('Validation failed: ', validateResult.errors);
+          responseValidationError(res, validateResult.errors[0]);
+          return;
+        }
+
+        if (!logoutRequestBody.refreshToken) {
+          console.error('Missing refresh token');
+          res.status(400).send({ error: 'Missing refresh token' });
+          return;
+        }
+        
+        await this.service.logout(logoutRequestBody.refreshToken);
+
+        res.sendStatus(200);
+      } catch (error) {
+        console.error('Error during logout process: ', error);
+        res.status(500).send({ error: 'Internal Server Error', details: error.message });
       }
-
-      await this.service.logout(logoutRequestBody.refreshToken);
-
-      res.sendStatus(200);
-      return;
     });
   }
 

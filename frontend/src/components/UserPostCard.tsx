@@ -9,7 +9,7 @@ import { httpRequest } from "../interceptor/axiosInterceptor";
 type UserPostCardProps = {
   image?: string;
   username: string;
-  followers: Array<string>;
+  followers: any;
   bio?: string;
   userId: string;
 };
@@ -23,9 +23,7 @@ export default function UserPostCard({
 }: UserPostCardProps) {
   const { user } = useAuth();
   const { socket } = useAppContext();
-  const [iFollow, setIFollow] = useState<boolean>(
-    () => followers?.includes(user?.id ?? "") ?? false
-  );
+  const [iFollow, setIFollow] = useState<boolean>(checkIfIFollow());
   const { refetch: follow } = useQuery({
     queryFn: () => httpRequest.put(`${url}/users/follow/${userId}`),
     queryKey: ["handle", "follow", userId],
@@ -36,6 +34,12 @@ export default function UserPostCard({
     queryKey: ["handle", "unfollow", userId],
     enabled: false,
   });
+
+  function checkIfIFollow() {
+    console.log(followers);
+    console.log(user?.id);
+    return followers?.includes(user?.id ?? "");
+  }
 
   function handleFollowUnfollow() {
     if (iFollow) {

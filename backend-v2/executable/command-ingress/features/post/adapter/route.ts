@@ -20,6 +20,7 @@ const setupPostRoute = (
     .put(controller.updatePost.bind(controller))
     .delete(controller.deletePost.bind(controller))
 
+    router.route('/feeds').get(requireAuthorizedUser, controller.fetchFollowingPosts.bind(controller));
   return router;
 }
 

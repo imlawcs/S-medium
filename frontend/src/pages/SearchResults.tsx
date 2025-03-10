@@ -141,16 +141,16 @@ export default function SearchResults() {
                                 showUserList={true}
                                 filterPost={filterPost}
                                 filterAuthorPost={filterAuthorPost}
-                                postId={item.post.id}
-                                timestamp={item.post.createdAt}
-                                title={item.post.title}
-                                username={item.user.name}
-                                userId={item.user.id}
-                                image={item.post.image}
-                                tag={item.post.tags.at(0)}
-                                userImage={item.user.avatar}
-                                key={item.post.id}
-                                summary={item.post.summary}
+                                postId={item.id}
+                                timestamp={new Date(item.createdAt).getTime().toString()}
+                                title={item.title}
+                                username={item.author.name}
+                                userId={item.author.id}
+                                image={item.image}
+                                tag={item.tags.at(0)}
+                                userImage={item.author.avatar}
+                                key={item.id}
+                                summary={item.summary}
                                 showMuteicon={false}
                             />
                         ))}
