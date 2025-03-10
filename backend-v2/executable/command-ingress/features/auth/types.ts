@@ -13,6 +13,7 @@ interface AuthService {
   exchangeWithGoogleIDP(request: ExchangeTokenRequest): Promise<ExchangeTokenResult>
   logout(token: string): Promise<void>
   refreshToken(token: string): Promise<ExchangeTokenResult>
+  createUserIfNotExists(userProfile: any): Promise<any>
 }
 
 

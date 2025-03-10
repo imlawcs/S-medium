@@ -7,7 +7,8 @@ const initAuthRoute: (controller: AuthController) => express.Router  = (controll
   router.route('/google/oauth').get(controller.exchangeGoogleToken.bind(controller));
   router.route('/logout').post(controller.logout.bind(controller));
   router.route('/token').post(controller.refreshToken.bind(controller));
-
+  router.route('/test').post(controller.createUser.bind(controller));
+  
   return router;
 };
 

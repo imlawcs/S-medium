@@ -2,22 +2,17 @@ import { createClient } from 'redis';
 import { Source } from '../source';
 import { Db } from 'mongodb';
 import EventEmitter from 'events';
+import post from '../../../../internal/model/post';
 
 class MongoDBChangeStreamSource implements Source {
     redisClient: ReturnType<typeof createClient>;
-    mongoDbClient: Db;
-    mongoDbCollectionName: string;
     watchOperations: string[];
 
     constructor(
         redisClient: ReturnType<typeof createClient>,
-        mongoDbClient: Db,
-        mongoDbCollectionName: string,
         watchOperations: string[] = ['insert', 'update', 'delete'] 
     ) {
         this.redisClient = redisClient;
-        this.mongoDbClient = mongoDbClient;
-        this.mongoDbCollectionName = mongoDbCollectionName;
         this.watchOperations = watchOperations;
     }
 
@@ -44,10 +39,10 @@ class MongoDBChangeStreamSource implements Source {
             }
         ];
 
-        console.info(`[MongoDBChangeStreamSource] Starting change stream on collection: ${this.mongoDbCollectionName}`);
+        console.info(`[MongoDBChangeStreamSource] Starting change stream on collection: ${post.collection.collectionName}`);
         console.info(`[MongoDBChangeStreamSource] Watching operations: ${this.watchOperations.join(', ')}`);
 
-        let changeStream = this.mongoDbClient.collection(this.mongoDbCollectionName).watch(pipeline, watchOptions);
+        let changeStream = post.watch(pipeline, watchOptions);
 
         changeStream.on('change', async (change) => {
             if (change?.operationType && this.watchOperations.includes(change.operationType)) {

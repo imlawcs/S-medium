@@ -72,8 +72,6 @@ class AuthController extends BaseController {
     });
   }
 
-
-
   async refreshToken(req: Request, res: Response, _next: NextFunction): Promise<void> {
     const refreshTokenRequestBody = new RefreshTokenRequestBody(req.body);
     const validateResult = await refreshTokenRequestBody.validate();
@@ -91,6 +89,24 @@ class AuthController extends BaseController {
 
     return;
   }
+
+  async createUser(req: Request, res: Response) {
+    const userProfile = req.body;
+
+    console.log("Nhận request tạo user:", userProfile);
+
+    try {
+        const user = await this.service.createUserIfNotExists(userProfile);
+        if (!user) {
+            return res.status(500).json({ error: "Không thể tạo user" });
+        }
+
+        return res.json({ message: "User created successfully", user });
+    } catch (error) {
+        console.error("Lỗi khi tạo user:", error);
+        return res.status(500).json({ error: error.message });
+    }
+}
 }
 
 export {

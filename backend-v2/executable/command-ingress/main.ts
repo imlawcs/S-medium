@@ -9,49 +9,39 @@ import { mustGetEnv } from '../../lib/env';
 import { connectRedis } from '../../lib/redis';
 import { createHttpServer } from './app';
 import env from './utils/env';
+import mongoose from 'mongoose';
 
 config();
 
 async function connectMongoDB() {
     const databaseUri = mustGetEnv('MONGO_URI');
-    const databaseName = mustGetEnv('MONGO_DB_NAME');
-    
-    let retries = 5;
-    let mongoClient;
-    
-    while (retries > 0) {
-        try {
-            mongoClient = await MongoClient.connect(databaseUri, {
-                // Tăng timeout connection
-                connectTimeoutMS: 30000,
-                // Tăng timeout cho các thao tác cụ thể
-                socketTimeoutMS: 30000,
-                // Tăng timeout cho việc lựa chọn server
-                serverSelectionTimeoutMS: 30000,
-                // Tăng max pool size
-                maxPoolSize: 50,
-            });
-            
-            const db = mongoClient.db(databaseName);
-            console.log('MongoDB connected successfully!');
-            return { db, mongoClient };
-        } catch (err) {
-            console.error(`MongoDB connection failed. Retries left: ${retries - 1}`);
-            retries -= 1;
-            if (retries === 0) {
-                console.error('Failed to connect to MongoDB after multiple attempts');
-                throw err;
-            }
-            await new Promise(res => setTimeout(res, 5000)); 
-        }
+
+    if (mongoose.connection.readyState !== 0) {
+        console.log("MongoDB đã kết nối, không cần kết nối lại!");
+        return mongoose.connection;
+    }
+
+    try {
+        await mongoose.connect(databaseUri, {
+            connectTimeoutMS: 30000,
+            socketTimeoutMS: 30000,
+            serverSelectionTimeoutMS: 30000,
+            maxPoolSize: 50,
+        });
+
+        console.log("MongoDB connected successfully!");
+        return mongoose.connection;
+    } catch (error) {
+        console.error("MongoDB connection failed:", error);
+        process.exit(1);
     }
 }
 
 async function main() {
     try {
         // Kết nối MongoDB trước
-        const { db, mongoClient } = await connectMongoDB();
-        if (!db || !mongoClient) {
+        const { db } = await connectMongoDB();
+        if (!db ) {
             throw new Error('Failed to connect to MongoDB');
         }
         
@@ -68,12 +58,11 @@ async function main() {
             console.log(`Server running on port ${env.PORT}`);
         });
 
-        const postCollection = 'posts';
+        const postCollection = ['posts'];
 
         const closeFn = () => {
             console.log('Received OS Signal. Exiting gracefully...');
             redisClient.quit();
-            mongoClient.close();
             process.exit(0);
         }
 
@@ -82,7 +71,6 @@ async function main() {
 
         const mongoChangeStreamSource = new MongoDBChangeStreamSource(
             redisClient,
-            db,
             postCollection,
         );
         const redisSink = new RedisSink(redisClient);

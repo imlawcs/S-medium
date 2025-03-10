@@ -3,6 +3,7 @@ import { AuthService, ExchangeTokenResult, ExchangeTokenRequest } from '../types
 import User from '../../../../../internal/model/user';
 import Session from '../../../../../internal/model/session';
 import jwt from 'jsonwebtoken';
+import mongoose from 'mongoose';
 import { GoogleIdentityBroker } from '../identity-broker/google-idp.broker';
 
 export class AuthServiceImpl implements AuthService {
@@ -35,7 +36,15 @@ export class AuthServiceImpl implements AuthService {
   }
 
   async createUserIfNotExists(userProfile: any): Promise<any> {
+    console.log("MongoDB readyState:", mongoose.connection.readyState);
+    if (mongoose.connection.readyState !== 1) {
+      console.error("MongoDB chưa kết nối, không thể thực hiện truy vấn!");
+      throw new Error("Database chưa kết nối");
+    }
+
     let user = await User.findOne({ email: userProfile.email });
+    console.log("Kiểm tra user:", user);  // Debug
+
     if (!user) {
       user = new User({
         name: userProfile.name,
@@ -50,7 +59,19 @@ export class AuthServiceImpl implements AuthService {
         ],
       });
 
-      await user.save();
+      console.log("Đang tạo user mới:", user);
+      
+      try {
+        if (mongoose.connection.readyState !== 1) {
+          console.error("MongoDB chưa kết nối, không thể lưu user!");
+          return null;
+        }
+        
+        await user.save();
+        console.log("User đã được lưu vào DB:", user);
+      } catch (error) {
+        console.error("Lỗi khi lưu user:", error);
+      }
     }
 
     return user;
@@ -74,7 +95,12 @@ export class AuthServiceImpl implements AuthService {
     const accessToken = this.signAccessToken(jwtPayload);
     const refreshToken = this.signRefreshToken(jwtPayload)
     const session = new Session({ sessionID: sessionID, userID: user._id });
-    await session.save();
+    try {
+      await session.save();
+      console.log("Session đã được lưu vào DB:", session);
+    } catch (error) {
+      console.error("Lỗi khi lưu session:", error);
+    }
 
     return {
       refreshToken,
